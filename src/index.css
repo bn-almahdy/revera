@@ -1,0 +1,266 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+
+:root {
+  --bg-color: #f8fbf8;
+  --primary-green: #a3e635;
+  --primary-green-hover: #84cc16;
+  --dark-green: #064e3b;
+  --text-main: #1f2937;
+  --text-light: #6b7280;
+  --nav-bg: rgba(255, 255, 255, 0.8);
+  --glass-border: rgba(255, 255, 255, 0.3);
+  --shadow-sm: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+  --shadow-md: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+
+html,
+body,
+#root {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-height: 100vh;
+}
+
+body {
+  font-family: 'Outfit', sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-main);
+  line-height: 1.5;
+  overflow-x: hidden;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.nav-link-item {
+  color: white;
+  opacity: 0.8;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.nav-link-item:hover {
+  opacity: 1;
+  color: var(--primary-green) !important;
+  transform: translateY(-2px);
+}
+
+.nav-link-item::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: var(--primary-green);
+  transition: width 0.3s ease;
+}
+
+.nav-link-item:hover::after {
+  width: 100%;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  background: none;
+  font-family: inherit;
+  transition: all 0.3s ease;
+}
+
+/* Utilities */
+.container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+.flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.glass {
+  background: var(--nav-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+}
+
+/* Animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+.animate-fade-in {
+  animation: fadeInUp 0.8s ease forwards;
+}
+
+.animate-float {
+  animation: float 4s ease-in-out infinite;
+}
+
+/* Button Styles */
+.btn-outline-nav {
+  padding: 0.6rem 1.7rem;
+  border-radius: 50px;
+  border: 1.5px solid var(--dark-green);
+  font-weight: 600;
+  color: var(--dark-green);
+  font-size: 0.9rem;
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  background: transparent;
+}
+
+.btn-outline-nav:hover {
+  background: var(--dark-green);
+  color: white;
+}
+
+.btn-get-started {
+  background: var(--primary-green);
+  color: var(--dark-green);
+  padding: 1.25rem 3.5rem;
+  border-radius: 100px;
+  font-size: 1.2rem;
+  font-weight: 700;
+  box-shadow: 0 15px 35px -12px rgba(163, 230, 53, 0.3);
+  transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-get-started:hover {
+  background: #bef264;
+}
+
+.btn-get-started:active {
+  transform: translateY(0) scale(0.98);
+}
+
+/* Rolling Text Animation - Updated to 3D Flip */
+.btn-roll {
+  position: relative;
+  overflow: hidden !important;
+  display: inline-grid !important;
+  place-items: center;
+  padding: 0 !important;
+  line-height: 1 !important;
+  perspective: 1000px;
+}
+
+.roll-text {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  transform-style: preserve-3d;
+  width: 100%;
+}
+
+.btn-roll:hover .roll-text {
+  transform: rotateX(90deg);
+}
+
+.btn-roll .roll-text span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+/* Base face */
+.btn-roll .roll-text span:first-child {
+  transform: rotateX(0deg) translateZ(21px); /* half of 42px */
+}
+
+/* Hover face */
+.btn-roll .roll-text span:last-child {
+  transform: rotateX(-90deg) translateZ(21px); /* half of 42px */
+}
+
+/* Offset for Hero Button */
+.btn-get-started.btn-roll .roll-text span:first-child {
+  transform: rotateX(0deg) translateZ(36px); /* half of 72px */
+}
+.btn-get-started.btn-roll .roll-text span:last-child {
+  transform: rotateX(-90deg) translateZ(36px); /* half of 72px */
+}
+.btn-get-started.btn-roll:hover .roll-text {
+  transform: rotateX(90deg);
+}
+
+/* Specific heights and alignment */
+.btn-outline-nav.btn-roll {
+  height: 48px;
+  min-width: 140px;
+}
+
+.btn-outline-nav.btn-roll .roll-text span {
+  height: 48px;
+}
+
+.btn-get-started.btn-roll {
+  height: 72px;
+  min-width: 240px;
+}
+
+.btn-get-started.btn-roll .roll-text span {
+  height: 72px;
+}
+
+/* SDG specific button heights and 3D offsets */
+.btn-sdg.btn-roll {
+  height: 56px;
+  min-width: 180px;
+}
+
+.btn-sdg.btn-roll .roll-text span {
+  height: 56px;
+}
+
+.btn-sdg.btn-roll .roll-text span:first-child {
+  transform: rotateX(0deg) translateZ(28px); /* half of 56px */
+}
+
+.btn-sdg.btn-roll .roll-text span:last-child {
+  transform: rotateX(-90deg) translateZ(28px); /* half of 56px */
+}
+
+.btn-sdg.btn-roll:hover .roll-text {
+  transform: rotateX(90deg);
+}
