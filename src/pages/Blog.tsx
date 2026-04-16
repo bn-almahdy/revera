@@ -18,7 +18,7 @@ const articles: Article[] = [
     date: "March 12, 2025",
     title: "AI-Driven MOFs: A New Frontier in Carbon Sequestration",
     excerpt: "Researchers have successfully deployed AI-designed Metal-Organic Frameworks (MOFs) that capture CO2 with 40% higher efficiency than previous methods, marking a pivotal shift in direct air capture viability.",
-    image: "https://lens.usercontent.google.com/image?vsrid=CKCL8ev84ei3exACGAEiJDBlN2QzMTg2LTAxNzUtNDkxNy1hNjdhLTUzNTdhNDFhMDQxYTJ7IgJ3ZSgJQnMKLmxmZS1kdW1teTo5MzlmMjhkNC1kMDk5LTQzMjktYmQzOC0yOGMwMGY4YjZhZDISQQo_L2Jucy93ZS9ib3JnL3dlL2Jucy9sZW5zLWZyb250ZW5kLWFwaS9wcm9kLmxlbnMtZnJvbnRlbmQtYXBpLzgzOKTw08vw75MD&gsessionid=DYpR1M6WLO6GTWYz0EPfVOn_ZsIlOiLR_zeFzC6mbwVRQy4gBzrKnA",
+    image: "/carbon-sequestration.png",
     readTime: "6 min read"
   },
   {
