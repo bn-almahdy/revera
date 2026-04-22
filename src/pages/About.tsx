@@ -1,58 +1,282 @@
-import React, { useEffect, useContext, useRef, useMemo, useState } from 'react';
+import React, { useEffect, useRef, useContext } from 'react';
 import { TransitionContext } from '../App';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { Draggable } from 'gsap/Draggable';
+import SplitText from '../components/SplitText';
 
-gsap.registerPlugin(ScrollTrigger);
+gsap.registerPlugin(ScrollTrigger, Draggable);
+
+const getRoleIcon = (role: string) => {
+  const r = role.toLowerCase();
+  if (r.includes('software')) return <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>;
+  if (r.includes('hardware') || r.includes('engineering')) return <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>;
+  if (r.includes('r&d') || r.includes('science')) return <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M4.5 3h15"/><path d="M6 3v16a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V3"/><path d="M6 14h12"/></svg>;
+  if (r.includes('ceo') || r.includes('cfo') || r.includes('business')) return <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="14" x="2" y="7" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>;
+  if (r.includes('marketing') || r.includes('pr')) return <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M11 15h2a2 2 0 1 0 0-4h-2a2 2 0 1 1 0-4h2"/><path d="M12 5V3"/><path d="M12 21v-2"/></svg>;
+  if (r.includes('qa')) return <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>;
+  if (r.includes('hr') || r.includes('ops') || r.includes('operations')) return <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>;
+  return <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/></svg>;
+};
 
 const TeamCard: React.FC<{ name: string, role: string, description: string, image: string }> = ({ name, role, description, image }) => {
-  const [isHovered, setIsHovered] = React.useState(false);
-  
   return (
     <div 
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
       style={{ 
         padding: '2.5rem', 
         borderRadius: '32px', 
         background: 'rgba(255, 255, 255, 0.95)', 
-        backdropFilter: 'blur(10px)',
-        WebkitBackdropFilter: 'blur(10px)',
+        backdropFilter: 'blur(20px)',
+        WebkitBackdropFilter: 'blur(20px)',
         border: '1px solid rgba(0, 0, 0, 0.05)',
-        boxShadow: isHovered ? '0 30px 60px rgba(0,0,0,0.08)' : '0 10px 30px rgba(0,0,0,0.02)',
-        transition: 'all 0.5s cubic-bezier(0.16, 1, 0.3, 1)',
-        transform: isHovered ? 'translateY(-10px)' : 'none',
+        boxShadow: '0 10px 30px rgba(0,0,0,0.02)',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        textAlign: 'center'
+        textAlign: 'center',
+        width: '350px',
+        flexShrink: 0,
+        margin: '0 1rem',
+        transition: 'all 0.4s ease'
       }}
     >
-      <div style={{ 
-        width: '120px', 
-        height: '120px', 
-        borderRadius: '50%', 
-        overflow: 'hidden', 
-        marginBottom: '1.5rem',
-        border: '4px solid white',
-        boxShadow: '0 10px 20px rgba(0,0,0,0.1)'
-      }}>
-        <img src={image} alt={name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+      <div style={{ position: 'relative', marginBottom: '1.5rem' }}>
+        <div style={{ 
+          width: '120px', 
+          height: '120px', 
+          borderRadius: '50%', 
+          overflow: 'hidden', 
+          border: '4px solid white',
+          boxShadow: '0 10px 20px rgba(0,0,0,0.1)'
+        }}>
+          <img src={image} alt={name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+        </div>
+        
+        {/* Role Icon Badge - Now outside overflow:hidden container */}
+        <div style={{
+          position: 'absolute',
+          bottom: '-2px',
+          right: '-2px',
+          width: '36px',
+          height: '36px',
+          background: 'var(--primary-green)',
+          color: '#1a3c34',
+          borderRadius: '50%',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          border: '3px solid white',
+          boxShadow: '0 4px 10px rgba(0,0,0,0.1)',
+          zIndex: 10
+        }}>
+          {getRoleIcon(role)}
+        </div>
       </div>
       
       <h4 style={{ fontSize: '1.4rem', color: '#1a3c34', fontWeight: 700, marginBottom: '0.4rem' }}>{name}</h4>
-      <p style={{ color: 'var(--primary-green)', fontWeight: 600, fontSize: '0.9rem', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '1.2rem' }}>{role}</p>
+      <p style={{ color: 'var(--primary-green)', fontWeight: 600, fontSize: '0.9rem', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '1.2rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+        {role}
+      </p>
       
       <p style={{ color: '#4b5563', fontSize: '0.95rem', lineHeight: 1.6, marginBottom: '1.5rem', opacity: 0.8 }}>
         {description}
       </p>
-
+ 
       <div style={{ display: 'flex', gap: '1rem', marginTop: 'auto' }}>
         <SocialLink href="#" icon={<svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>} />
         <SocialLink href="#" icon={<svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M23.954 4.569c-.885.392-1.83.656-2.825.775 1.014-.611 1.794-1.574 2.163-2.723-.951.555-2.005.959-3.127 1.184-.899-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"/></svg>} />
-        <SocialLink href="#" icon={<svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M0 3v18h24v-18h-24zm6.623 7.929l-4.623 5.712v-9.458l4.623 3.746zm-4.141-5.929h19.035l-9.517 7.713-9.518-7.713zm5.694 7.188l3.824 3.099l3.83-3.104 5.612 8.817h-18.779l5.513-8.812zm9.208-1.264l4.616-3.741v9.346l-4.616-5.605z"/></svg>} />
       </div>
+    </div>
+  );
+};
+const TeamMarquee: React.FC = () => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const marqueeRef = useRef<HTMLDivElement>(null);
+  const loopRef = useRef<any>(null);
+
+  useGSAP(() => {
+    const marquee = marqueeRef.current;
+    if (!marquee) return;
+
+    const cards = Array.from(marquee.children) as HTMLElement[];
+
+    // This is a robust horizontal loop helper for GSAP
+    function horizontalLoop(items: HTMLElement[], config: any) {
+      items = gsap.utils.toArray(items);
+      config = config || {};
+      let tl = gsap.timeline({
+          repeat: config.repeat,
+          paused: config.paused,
+          defaults: { ease: "none" },
+          onReverseComplete: () => tl.totalTime(tl.rawTime() + tl.duration() * 100)
+        }),
+        length = items.length,
+        startX = items[0].offsetLeft,
+        times: number[] = [],
+        widths: number[] = [],
+        xPercents: number[] = [],
+        curIndex = 0,
+        pixelsPerSecond = (config.speed || 1) * 100,
+        totalWidth: number, curX: number, distanceToStart: number, distanceToLoop: number, item: HTMLElement, i: number;
+      
+      gsap.set(items, {
+        xPercent: (i, target) => {
+          widths[i] = parseFloat(gsap.getProperty(target, "width", "px") as string);
+          xPercents[i] = parseFloat(gsap.getProperty(target, "xPercent") as string);
+          return xPercents[i];
+        }
+      });
+      totalWidth = items[length - 1].offsetLeft + xPercents[length - 1] / 100 * widths[length - 1] - startX + items[length - 1].offsetWidth * (gsap.getProperty(items[length - 1], "scaleX") as number) + (parseFloat(config.paddingRight) || 0);
+      for (i = 0; i < length; i++) {
+        item = items[i];
+        curX = xPercents[i] / 100 * widths[i];
+        distanceToStart = item.offsetLeft + curX - startX;
+        distanceToLoop = distanceToStart + widths[i] * (gsap.getProperty(item, "scaleX") as number);
+        tl.to(item, { xPercent: gsap.utils.wrap(0, -totalWidth / widths[i] * 100, (curX - distanceToLoop) / widths[i] * 100), duration: distanceToLoop / pixelsPerSecond }, 0)
+          .fromTo(item, { xPercent: gsap.utils.wrap(0, -totalWidth / widths[i] * 100, (curX - distanceToLoop + totalWidth) / widths[i] * 100) }, { xPercent: xPercents[i], duration: (curX - distanceToLoop + totalWidth - curX) / pixelsPerSecond, immediateRender: false }, distanceToLoop / pixelsPerSecond);
+        times[i] = distanceToStart / pixelsPerSecond;
+      }
+
+      function toIndex(index: number, vars: any) {
+        vars = vars || {};
+        (Math.abs(index - curIndex) > length / 2) && (index += index > curIndex ? -length : length);
+        let newIndex = gsap.utils.wrap(0, length, index),
+          time = times[newIndex];
+        if (time > tl.time() !== index > curIndex) {
+          vars.modifiers = { time: gsap.utils.wrap(0, tl.duration()) };
+          time += tl.duration() * (index > curIndex ? 1 : -1);
+        }
+        curIndex = newIndex;
+        vars.overwrite = true;
+        // Pause the auto-play loop, tween to the index, then resume
+        tl.pause();
+        return gsap.to(tl, {
+          time: time,
+          ...vars,
+          onComplete: () => {
+             tl.play();
+             vars.onComplete && vars.onComplete();
+          }
+        });
+      }
+
+      tl.next = (vars: any) => toIndex(curIndex + 1, vars);
+      tl.prev = (vars: any) => toIndex(curIndex - 1, vars);
+      tl.current = () => curIndex;
+      tl.toIndex = (index: number, vars: any) => toIndex(index, vars);
+      tl.progress(1, true).progress(0, true);
+      if (config.reversed) {
+        tl.vars.onReverseComplete?.();
+        tl.reverse();
+      }
+      
+      return tl;
+    }
+
+    // Give time for layout to settle
+    const timer = setTimeout(() => {
+      loopRef.current = horizontalLoop(cards, {
+        speed: 0.8,
+        repeat: -1,
+        paddingRight: 32
+      });
+      loopRef.current.play();
+    }, 100);
+
+    return () => clearTimeout(timer);
+  }, { scope: marqueeRef });
+
+  return (
+    <div 
+      style={{ position: 'relative', width: '100vw', marginLeft: 'calc(-50vw + 50%)', padding: '2rem 0' }}
+    >
+      <div style={{
+        position: 'absolute',
+        top: '50%',
+        left: 'max(2rem, calc(50vw - 640px))', 
+        right: 'max(2rem, calc(50vw - 640px))',
+        transform: 'translateY(-50%)',
+        display: 'flex',
+        justifyContent: 'space-between',
+        zIndex: 9999, // Max z-index
+        pointerEvents: 'none'
+      }}>
+        <button 
+          onClick={() => loopRef.current?.prev({ duration: 0.8, ease: "power3.inOut" })}
+          className="carousel-btn"
+          style={{
+            width: '68px',
+            height: '68px',
+            borderRadius: '50%',
+            background: 'rgba(255, 255, 255, 0.9)',
+            backdropFilter: 'blur(10px)',
+            border: '2px solid white',
+            boxShadow: '0 20px 40px rgba(0,0,0,0.15)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer',
+            pointerEvents: 'auto',
+            transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)'
+          }}
+        >
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#1a3c34" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+        </button>
+        <button 
+          onClick={() => loopRef.current?.next({ duration: 0.8, ease: "power3.inOut" })}
+          className="carousel-btn"
+          style={{
+            width: '68px',
+            height: '68px',
+            borderRadius: '50%',
+            background: 'rgba(255, 255, 255, 0.9)',
+            backdropFilter: 'blur(10px)',
+            border: '2px solid white',
+            boxShadow: '0 20px 40px rgba(0,0,0,0.15)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer',
+            pointerEvents: 'auto',
+            transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)'
+          }}
+        >
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#1a3c34" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+        </button>
+      </div>
+
+      <div 
+        ref={containerRef}
+        style={{ 
+          width: '100%', 
+          overflow: 'hidden', 
+          cursor: 'default'
+        }}
+      >
+        <div 
+          ref={marqueeRef}
+          style={{ 
+            display: 'flex',
+            width: 'max-content',
+            padding: '2rem 32px'
+          }}
+        >
+          {teamMembers.map((member, index) => (
+            <TeamCard key={index} {...member} />
+          ))}
+        </div>
+      </div>
+      
+      <style>{`
+        .carousel-btn:hover {
+          transform: scale(1.1);
+          background: var(--primary-green) !important;
+        }
+        .carousel-btn:hover stroke {
+          stroke: white !important;
+        }
+      `}</style>
     </div>
   );
 };
@@ -62,14 +286,11 @@ const SocialLink: React.FC<{ href: string, icon: React.ReactNode }> = ({ href, i
     href={href} 
     style={{ 
       color: '#1a3c34', 
-      opacity: 0.6, 
-      transition: 'all 0.3s ease',
+      opacity: 0.9, 
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center'
     }}
-    onMouseEnter={(e) => e.currentTarget.style.color = 'var(--primary-green)'}
-    onMouseLeave={(e) => e.currentTarget.style.color = '#1a3c34'}
   >
     {icon}
   </a>
@@ -554,8 +775,8 @@ const About: React.FC = () => {
       <main className="container" style={{ paddingTop: '160px' }}>
         {/* --- Hero Section --- */}
         <section style={{ 
-          maxWidth: '900px', 
-          margin: '0 auto 6rem auto', // Reduced margin slightly for tighter flow
+          maxWidth: '1100px', 
+          margin: '0 auto 6rem auto', 
           textAlign: 'center',
           display: 'flex',
           flexDirection: 'column',
@@ -570,7 +791,12 @@ const About: React.FC = () => {
             lineHeight: 1.1,
             letterSpacing: '-0.02em',
           }}>
-            Take control of your carbon footprint
+            <SplitText 
+              text="Take control of your carbon footprint"
+              delay={50}
+              from={{ opacity: 0, transform: 'translate3d(0,30px,0)' }}
+              to={{ opacity: 1, transform: 'translate3d(0,0,0)' }}
+            />
           </h1>
           
           <p style={{ 
@@ -580,9 +806,12 @@ const About: React.FC = () => {
             opacity: 0.9,
             maxWidth: '720px',
           }}>
-            ReVera helps you connect with high-quality, data-driven restoration 
-            projects that capture carbon and use site-specific technology to 
-            guarantee permanent, measurable impact.
+            <SplitText 
+              text="ReVera helps you connect with high-quality, data-driven restoration projects that capture carbon and use site-specific technology to guarantee permanent, measurable impact."
+              delay={30}
+              from={{ opacity: 0, transform: 'translate3d(0,20px,0)' }}
+              to={{ opacity: 1, transform: 'translate3d(0,0,0)' }}
+            />
           </p>
         </section>
 
@@ -610,24 +839,26 @@ const About: React.FC = () => {
               background: '#0a1a12', 
               borderRadius: '32px', 
               overflow: 'hidden',
-              position: 'relative'
+              position: 'relative',
+              boxShadow: '0 20px 40px rgba(0,0,0,0.4)'
             }}>
-              <video 
-                controls
-                playsInline 
-                preload="auto"
-                style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} 
-              >
-                <source src="/our%20story.mp4" type="video/mp4" />
-                Your browser does not support the video tag.
-              </video>
+              <iframe 
+                width="100%" 
+                height="100%" 
+                src="https://www.youtube.com/embed/ysz5S6PUM-U?autoplay=0&controls=1&rel=0" 
+                title="Our Story" 
+                frameBorder="0" 
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                allowFullScreen
+                style={{ position: 'absolute', top: 0, left: 0 }}
+              ></iframe>
               
               {/* Overlay with label */}
               <div style={{ 
                 position: 'absolute', 
                 bottom: '2rem', 
                 left: '2rem', 
-                background: 'rgba(0,0,0,0.5)', 
+                background: 'rgba(5, 10, 8, 0.7)', 
                 backdropFilter: 'blur(10px)',
                 padding: '0.75rem 1.5rem',
                 borderRadius: '100px',
@@ -637,7 +868,8 @@ const About: React.FC = () => {
                 display: 'flex',
                 alignItems: 'center',
                 gap: '0.75rem',
-                border: '1px solid rgba(255,255,255,0.1)'
+                border: '1px solid rgba(255,255,255,0.1)',
+                pointerEvents: 'none'
               }}>
                 <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--primary-green)', boxShadow: '0 0 10px var(--primary-green)' }} />
                 OUR STORY
@@ -647,23 +879,13 @@ const About: React.FC = () => {
         </section>
 
         {/* --- Team Section --- */}
-        <section ref={teamRef} style={{ marginBottom: '10rem' }}>
+        <section ref={teamRef} style={{ marginBottom: '10rem', position: 'relative' }}>
           <div style={{ textAlign: 'center', marginBottom: '5rem' }}>
             <h2 style={{ fontSize: '3.5rem', fontWeight: 700, color: '#1a3c34', marginBottom: '1rem' }}>Leadership & Innovation</h2>
             <p style={{ color: '#4b5563', fontSize: '1.2rem', maxWidth: '600px', margin: '0 auto' }}>Meet the dedicated team behind ReVera's mission.</p>
           </div>
 
-          <div style={{ 
-            display: 'grid', 
-            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', 
-            gap: '2.5rem' 
-          }}>
-            {teamMembers.map((member, idx) => (
-              <div key={idx} className="team-card-trigger">
-                <TeamCard {...member} />
-              </div>
-            ))}
-          </div>
+          <TeamMarquee />
         </section>
 
         {/* --- SDG Section --- */}

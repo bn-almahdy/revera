@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { TransitionContext } from '../App';
+import SplitText from '../components/SplitText';
 
 const ServicesPage: React.FC = () => {
   const { navigateTo } = React.useContext(TransitionContext);
@@ -45,10 +45,18 @@ const ServicesPage: React.FC = () => {
             Technology Portfolio
           </div>
           <h1 style={{ fontSize: 'clamp(3rem, 7vw, 4.5rem)', color: '#1a3c34', fontWeight: 950, marginBottom: '1.5rem', letterSpacing: '-0.03em' }}>
-            Future-Proof <span style={{ color: 'var(--primary-green)' }}>Ecosystems</span>
+            <SplitText 
+              text="Future-Proof Ecosystems"
+              delay={50}
+              from={{ opacity: 0, transform: 'translate3d(0,40px,0)' }}
+              to={{ opacity: 1, transform: 'translate3d(0,0,0)' }}
+            />
           </h1>
           <p style={{ fontSize: '1.2rem', color: '#1a3c34', opacity: 0.6, lineHeight: 1.6, maxWidth: '700px', margin: '0 auto' }}>
-            Discover our suite of hardware-software integrations designed for precision environmental management and restoration.
+            <SplitText 
+              text="Discover our suite of hardware-software integrations designed for precision environmental management and restoration."
+              delay={30}
+            />
           </p>
         </section>
 

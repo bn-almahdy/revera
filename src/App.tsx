@@ -8,6 +8,9 @@ import AboutPage from './pages/About';
 import ServicesPage from './pages/Services';
 import ContactPage from './pages/Contact';
 import Blog from './pages/Blog';
+import SplitText from './components/SplitText';
+import RotatingText from './components/RotatingText';
+import ScrollReveal from './components/ScrollReveal';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -15,67 +18,54 @@ gsap.registerPlugin(ScrollTrigger);
 export const TransitionContext = createContext<{
   isTransitioning: boolean;
   navigateTo: (path: string) => void;
-}>({ isTransitioning: false, navigateTo: () => {} });
+}>({ isTransitioning: false, navigateTo: (_path: string) => {} });
 
 const TreeTransition: React.FC<{ isVisible: boolean }> = ({ isVisible }) => {
   const leftRef = useRef<HTMLDivElement>(null);
   const rightRef = useRef<HTMLDivElement>(null);
-  const [render, setRender] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [isActive, setIsActive] = useState(false);
 
   useEffect(() => {
-    if (isVisible) setRender(true);
+    if (isVisible) setIsActive(true);
   }, [isVisible]);
 
   useGSAP(() => {
     if (isVisible) {
       gsap.to(leftRef.current, { xPercent: 100, duration: 0.8, ease: 'power4.inOut' });
       gsap.to(rightRef.current, { xPercent: -100, duration: 0.8, ease: 'power4.inOut' });
-    } else if (render) {
+    } else {
       gsap.to(leftRef.current, { xPercent: 0, duration: 0.7, ease: 'power4.inOut' });
-      gsap.to(rightRef.current, { xPercent: 0, duration: 0.7, ease: 'power4.inOut', onComplete: () => setRender(false) });
+      gsap.to(rightRef.current, { xPercent: 0, duration: 0.7, ease: 'power4.inOut', onComplete: () => setIsActive(false) });
     }
-  }, [isVisible, render]);
-
-  if (!render) return null;
+  }, { dependencies: [isVisible], scope: containerRef });
 
   return (
-    <div style={{
+    <div ref={containerRef} style={{
       position: 'fixed',
       top: 0,
       left: 0,
       width: '100vw',
       height: '100vh',
-      zIndex: 99999,
-      pointerEvents: isVisible ? 'all' : 'none',
+      zIndex: 2000000000,
+      pointerEvents: isVisible ? 'auto' : 'none',
       display: 'flex',
-      overflow: 'hidden'
+      overflow: 'hidden',
+      visibility: (isVisible || isActive) ? 'visible' : 'hidden'
     }}>
       <div ref={leftRef} style={{ 
-        width: '50%', 
-        height: '100%', 
-        position: 'absolute',
-        top: 0,
-        left: '-50%',
-        zIndex: 2
+        width: '50%', height: '100%', position: 'absolute', top: 0, left: '-50%', zIndex: 2 
       }}>
         <img src="/top.png" alt="" style={{ height: '100%', width: '100%', objectFit: 'cover' }} />
       </div>
       <div ref={rightRef} style={{ 
-        width: '50%', 
-        height: '100%', 
-        position: 'absolute',
-        top: 0,
-        right: '-50%',
-        zIndex: 1
+        width: '50%', height: '100%', position: 'absolute', top: 0, right: '-50%', zIndex: 1 
       }}>
         <img src="/bottom.png" alt="" style={{ height: '100%', width: '100%', objectFit: 'cover' }} />
       </div>
     </div>
   );
 };
-
-
-
 
 
 const SponsorshipSection: React.FC = () => (
@@ -110,10 +100,10 @@ const SponsorshipSection: React.FC = () => (
           In Collaboration With
         </p>
         <img 
-          src="/FT logo.jpg.jpeg" 
+          src="/future tech.png" 
           alt="Future Tech Logo" 
           style={{ 
-            height: '80px', 
+            height: '200px', 
             width: 'auto',
             objectFit: 'contain',
             borderRadius: '12px'
@@ -122,21 +112,23 @@ const SponsorshipSection: React.FC = () => (
       </div>
       
       <div style={{ position: 'relative' }}>
-        <h3 style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--dark-green)', marginBottom: '1rem' }}>
-          Accelerating Environmental Innovation
-        </h3>
-        <p style={{ 
-          fontSize: '1.1rem', 
-          lineHeight: 1.7, 
-          color: 'var(--text-main)',
-          opacity: 0.8,
-          fontWeight: 400
-        }}>
-          ReVera is proudly supported by <span style={{ fontWeight: 700, color: 'var(--dark-green)' }}>Future Tech</span>. 
-          Through this exclusive partnership, we leverage advanced computing to optimize our 
-          reforestation efforts, ensuring every seed planted is guided by data-driven precision 
-          for maximum environmental impact.
-        </p>
+        <ScrollReveal baseOpacity={0.3} blurStrength={5}>
+          <h3 style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--dark-green)', marginBottom: '1rem' }}>
+            Accelerating Environmental Innovation
+          </h3>
+          <p style={{ 
+            fontSize: '1.1rem', 
+            lineHeight: 1.7, 
+            color: 'var(--text-main)',
+            opacity: 0.8,
+            fontWeight: 400
+          }}>
+            ReVera is proudly supported by <span style={{ fontWeight: 700, color: 'var(--dark-green)' }}>Future Tech</span>. 
+            Through this exclusive partnership, we leverage advanced computing to optimize our 
+            reforestation efforts, ensuring every seed planted is guided by data-driven precision 
+            for maximum environmental impact.
+          </p>
+        </ScrollReveal>
       </div>
     </div>
   </section>
@@ -177,83 +169,81 @@ const FloatingStats: React.FC<{ top: string; left?: string; right?: string; icon
 );
 
 const ImpactSection: React.FC = () => {
-  const videoRef = useRef<HTMLVideoElement>(null);
-
-  // Manual play enabled
-  useEffect(() => {
-    // ScrollTrigger refresh logic if needed
-  }, []);
-
   return (
-    <section className="container" id="about" style={{ marginBottom: '8rem' }}>
+    <section className="container" id="about" style={{ marginBottom: '2rem', padding: '4rem 0' }}>
       <div style={{
-        backgroundColor: '#12241b',
-        borderRadius: '40px',
-        padding: '4rem',
         display: 'grid',
-        gridTemplateColumns: 'minmax(0, 1.2fr) minmax(0, 1fr)',
-        gap: '4rem',
-        alignItems: 'center',
-        overflow: 'hidden'
+        gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1.3fr)', // Increased video column width
+        gap: '6rem',
+        alignItems: 'center'
       }}>
-        <div style={{ borderRadius: '24px', overflow: 'hidden', height: '600px', position: 'relative', background: '#0a1a12' }}>
-          <video 
-            ref={videoRef}
-            controls
-            playsInline 
-            preload="auto"
-            style={{ 
-              width: '100%', 
-              height: '100%', 
-              objectFit: 'cover', 
-              objectPosition: 'center center', 
-              display: 'block',
-              transform: 'scale(1.15) translateY(-5%)', // Significant upward shift
-              transition: 'transform 0.3s ease-out'
-            }} 
-          >
-            <source src="/about.mp4" type="video/mp4" />
-            Your browser does not support the video tag.
-          </video>
-        </div>
-        
-        <div style={{ color: 'white' }}>
+        <div style={{}}>
           <h2 style={{ 
-            fontSize: '3rem', 
-            fontWeight: 700, 
-            lineHeight: 1.2, 
-            marginBottom: '2rem' 
+            fontSize: 'clamp(3rem, 6vw, 4.5rem)', 
+            fontWeight: 800, 
+            lineHeight: 1.1, 
+            marginBottom: '2.5rem',
+            color: 'var(--dark-green)',
+            letterSpacing: '-0.03em'
           }}>
-            About ReVera
+            Pioneering<br />
+            <span style={{ color: 'var(--primary-green-hover)' }}>Ecosystem</span><br />
+            Recovery
           </h2>
           
-          <p style={{ 
-            fontSize: '1.15rem', 
-            lineHeight: 1.7, 
-            color: 'rgba(255, 255, 255, 0.8)',
-            marginBottom: '3rem',
-          }}>
-            ReVera is a pioneer in data-driven environmental engineering. 
-            By bridging the gap between advanced technology and site-specific reforestation, 
-            we restore ecosystems with measurable, permanent results for a sustainable future.
-          </p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            <p style={{ 
+              fontSize: '1.2rem', 
+              lineHeight: 1.6, 
+              color: 'var(--text-main)',
+              opacity: 0.9,
+              fontWeight: 500
+            }}>
+              ReVera bridges the gap between technology and site-specific reforestation, 
+              restoring ecosystems with precision and measurable results.
+            </p>
+          </div>
           
-          <NavBtn to="/about" className="btn-get-started btn-roll" style={{ 
-            background: 'var(--primary-green)', 
-            color: 'var(--dark-green)',
-            padding: '0 3rem',
-            display: 'inline-grid',
-            placeItems: 'center',
-            height: '72px',
-            minWidth: '280px',
-            fontSize: '1.1rem',
-            borderRadius: '100px'
+          <div style={{ marginTop: '3.5rem' }}>
+            <NavBtn to="/about" className="btn-get-started btn-roll" style={{ 
+              background: 'var(--dark-green)', 
+              color: 'white',
+              padding: '0 3rem',
+              display: 'inline-grid',
+              placeItems: 'center',
+              height: '72px',
+              minWidth: '280px',
+              fontSize: '1.1rem',
+              borderRadius: '100px'
+            }}>
+              <div className="roll-text" style={{ height: '72px' }}>
+                <span style={{ height: '72px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>Get to know us more</span>
+                <span style={{ height: '72px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>Get to know us more</span>
+              </div>
+            </NavBtn>
+          </div>
+        </div>
+
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
+          <div style={{ 
+            borderRadius: '40px', 
+            overflow: 'hidden', 
+            boxShadow: '0 40px 100px rgba(0,0,0,0.15)',
+            background: '#0a1a12',
+            aspectRatio: '16/10', // Slightly taller/larger presence
+            width: '100%'
           }}>
-            <div className="roll-text" style={{ height: '72px' }}>
-              <span style={{ height: '72px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>Get to know us more</span>
-              <span style={{ height: '72px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>Get to know us more</span>
-            </div>
-          </NavBtn>
+            <iframe 
+              width="100%" 
+              height="100%" 
+              src="https://www.youtube.com/embed/VIDEO_ID" 
+              title="About ReVera Video" 
+              frameBorder="0" 
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+              allowFullScreen
+              style={{ display: 'block' }}
+            ></iframe>
+          </div>
         </div>
       </div>
     </section>
@@ -397,17 +387,18 @@ const ScrollSequence: React.FC = () => {
           zIndex: 2,
           width: '80%'
         }}>
-          <h2 
+          <h2
             ref={scrollTextRef}
             style={{ 
               fontSize: 'clamp(2rem, 5vw, 4.5rem)', 
               fontWeight: 700, 
               textShadow: '0 4px 12px rgba(0,0,0,0.5)',
               marginBottom: '1rem',
+              color: 'white',
               opacity: 1
             }}
           >
-            A Greener Future
+            The Journey Begins
           </h2>
           <p style={{ opacity: 0.6, fontSize: '1.2rem', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
             Scroll to Witness the Impact
@@ -418,17 +409,97 @@ const ScrollSequence: React.FC = () => {
   );
 };
 
+const CitySequence: React.FC = () => {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const frameCount = 150;
+  const isPlaying = useRef(false);
+
+  const currentFrame = (index: number) => 
+    `/city/ezgif-frame-${(index + 1).toString().padStart(3, '0')}.jpg`;
+
+  useGSAP(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const context = canvas.getContext("2d");
+    if (!context) return;
+
+    canvas.width = 1920;
+    canvas.height = 1010;
+
+    const img = new Image();
+    img.src = currentFrame(0);
+    img.onload = () => context.drawImage(img, 0, 0);
+
+    const updateImage = (index: number) => {
+      img.src = currentFrame(index);
+      context.drawImage(img, 0, 0);
+    };
+
+    // Auto-play when section enters viewport
+    ScrollTrigger.create({
+      trigger: containerRef.current,
+      start: "top 80%", // Start early so it's moving when seen
+      onEnter: () => {
+        if (isPlaying.current) return;
+        isPlaying.current = true;
+        
+        const obj = { frame: 0 };
+        gsap.to(obj, {
+          frame: frameCount - 1,
+          duration: 3, // 3 seconds to play the full sequence
+          ease: "none",
+          onUpdate: () => {
+            updateImage(Math.floor(obj.frame));
+          }
+        });
+      }
+    });
+  }, { scope: containerRef });
+
+  return (
+    <div ref={containerRef} style={{ width: '100%', height: 'auto', borderRadius: '40px', overflow: 'hidden', background: '#0a1a12', position: 'relative' }}>
+      <canvas
+        ref={canvasRef}
+        style={{
+          width: '100%',
+          height: 'auto',
+          display: 'block'
+        }}
+      />
+    </div>
+  );
+};
+
 const Hero: React.FC = () => (
-  <div className="hero-content animate-fade-in" style={{ textAlign: 'center', marginBottom: '4rem' }}>
-    <h1 style={{
-      fontSize: 'clamp(2.5rem, 8vw, 4.5rem)',
-      fontWeight: 700,
-      color: 'var(--dark-green)',
-      marginBottom: '1.5rem',
-      letterSpacing: '-0.02em'
-    }}>
-      Planting a better future
-    </h1>
+  <div className="hero-content animate-fade-in" style={{ 
+    display: 'flex', 
+    flexDirection: 'column', 
+    alignItems: 'center', 
+    textAlign: 'center', 
+    marginBottom: '4rem' 
+  }}>
+    <SplitText
+      text="Planting a better future"
+      tag="h1"
+      className="hero-title"
+      textAlign="center"
+      delay={40}
+      duration={1.5}
+      ease="power4.out"
+      rootMargin="200px" // Ensure it triggers early even if scrolled slightly
+      from={{ opacity: 0, y: 80, rotateX: 30 }}
+      to={{ opacity: 1, y: 0, rotateX: 0 }}
+      style={{
+        fontSize: 'clamp(2.5rem, 8vw, 4.5rem)',
+        fontWeight: 700,
+        color: 'var(--dark-green)',
+        marginBottom: '1.5rem',
+        letterSpacing: '-0.02em',
+        lineHeight: 1.1,
+        width: '100%'
+      }}
+    />
     
     <NavBtn to="/contact" className="btn-get-started btn-roll" style={{ background: 'var(--primary-green)', color: 'var(--dark-green)', height: '72px', width: '240px', display: 'inline-grid', placeItems: 'center', borderRadius: '100px' }}>
       <div className="roll-text" style={{ height: '72px' }}>
@@ -445,7 +516,7 @@ const LocationSection: React.FC = () => (
       borderRadius: '40px',
       padding: '4rem',
       display: 'grid',
-      gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1.2fr)',
+      gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 2fr)', // Enlarged the map column
       gap: '4rem',
       alignItems: 'center',
       overflow: 'hidden',
@@ -494,7 +565,7 @@ const LocationSection: React.FC = () => (
       </div>
       
       <div style={{ 
-        height: '450px', 
+        height: '600px', // Increased from 450px
         borderRadius: '30px', 
         overflow: 'hidden',
         boxShadow: '0 20px 40px rgba(0,0,0,0.08)',
@@ -627,32 +698,131 @@ const Footer: React.FC = () => (
   </footer>
 );
 
-const LandingPage: React.FC<{ lenis: Lenis | null }> = ({ lenis }) => {
+const LandingPage: React.FC = () => {
   return (
     <>
       <main>
-        <div className="scroll-sequence-section">
-          <ScrollSequence />
+        {/* SECTION 1: Welcoming Splash */}
+        <section style={{ width: '100%', height: '100vh', position: 'relative', background: '#050a08', overflow: 'hidden' }}>
+          <video 
+            src="/background.mp4" 
+            autoPlay 
+            muted 
+            loop 
+            playsInline 
+            style={{ 
+              position: 'absolute', 
+              inset: 0, 
+              width: '100%', 
+              height: '100%', 
+              objectFit: 'cover', 
+              opacity: 0.45 
+            }} 
+          />
+          
+          <div style={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            textAlign: 'center',
+            color: 'white',
+            zIndex: 10,
+            width: '95%'
+          }}>
+            <h1 style={{ 
+              fontSize: 'clamp(2.5rem, 6vw, 4.8rem)',
+              fontWeight: 900, 
+              letterSpacing: '-0.04em',
+              marginBottom: '1rem',
+              display: 'flex',
+              flexWrap: 'wrap',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '0.3em',
+              lineHeight: 1
+            }}>
+              <span style={{ color: 'white' }}>Our</span>
+              <RotatingText
+                texts={['Mission', 'Impact', 'Innovation', 'Ecosystems', 'Sustainability', 'Future']}
+                mainClassName="overflow-hidden justify-center inline-flex items-center"
+                staggerFrom="last"
+                initial={{ y: "150%" }}
+                animate={{ y: 0 }}
+                exit={{ y: "-150%" }}
+                staggerDuration={0.025}
+                splitLevelClassName="overflow-hidden"
+                transition={{ type: "spring", damping: 30, stiffness: 400 }}
+                rotationInterval={4000} // Slower for better readability
+                splitBy="characters"
+                auto
+                loop // This prop makes it infinite
+                style={{ 
+                  backgroundColor: 'var(--primary-green)',
+                  color: 'white',
+                  padding: '0 0.8em',
+                  borderRadius: '0.3em',
+                  height: '1.2em',
+                  verticalAlign: 'middle',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  overflow: 'hidden'
+                }}
+              />
+            </h1>
+            <SplitText
+              text="Engineering the Lungs of Tomorrow"
+              className="split-heading-hero"
+              delay={80}
+              from={{ opacity: 0, transform: 'translate3d(0,40px,0)' }}
+              to={{ opacity: 1, transform: 'translate3d(0,0,0)' }}
+              ease="power3.out"
+              rootMargin="-50px"
+              style={{ 
+                letterSpacing: '0.6em', 
+                textTransform: 'uppercase', 
+                fontSize: '0.9rem', 
+                opacity: 0.8, 
+                fontWeight: 700, 
+                marginTop: '2rem',
+                color: 'white'
+              }}
+            />
+          </div>
+          
+          <div style={{
+            position: 'absolute',
+            bottom: '5%',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            zIndex: 10
+          }}>
+            <div className="animate-float" style={{ width: '1px', height: '60px', background: 'linear-gradient(to bottom, var(--primary-green), transparent)', margin: '0 auto' }} />
+          </div>
+        </section>
+
+        {/* SECTION 2: About Us (ImpactSection) */}
+        <div style={{ paddingTop: '2rem' }}>
+          <ScrollReveal>
+            <ImpactSection />
+          </ScrollReveal>
         </div>
 
-        <div className="container" style={{ paddingTop: '8rem', position: 'relative' }}>
-          <Hero />
+        {/* SECTION 3: Hero (Planting a better future) */}
+        <div className="container" style={{ padding: '0 0 4rem 0', position: 'relative' }}>
+          <ScrollReveal>
+            <Hero />
+          </ScrollReveal>
 
           <div className="visual-area animate-fade-in" style={{
             position: 'relative',
             width: '100%',
             maxWidth: '1000px',
             margin: '0 auto',
-            paddingBottom: '8rem',
+            paddingBottom: '4rem',
             animationDelay: '0.2s'
           }}>
-            <div style={{ width: '100%', height: 'auto', borderRadius: '40px', overflow: 'hidden' }}>
-              <img 
-                src="/hero.png" 
-                alt="Sustainable City Illustration" 
-                style={{ width: '100%', height: 'auto', display: 'block', transform: 'scale(1.05)', transition: 'transform 0.8s ease-out' }} 
-              />
-            </div>
+            <CitySequence />
 
             <FloatingStats 
               top="10%" 
@@ -672,91 +842,118 @@ const LandingPage: React.FC<{ lenis: Lenis | null }> = ({ lenis }) => {
           </div>
         </div>
 
+        {/* SECTION 4: Scroll Sequence (Frame by Frame) */}
+        <div className="scroll-sequence-section">
+          <ScrollSequence />
+        </div>
+
         <SponsorshipSection />
-        <ImpactSection />
+        
+        <div style={{ height: '8rem' }} /> {/* Extra breathing room */}
         
         {/* --- SIRA Flagship Project Section --- */}
         <section className="container" id="sira" style={{ marginBottom: '8rem' }}>
-          <div style={{
-            background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
-            borderRadius: '40px',
-            overflow: 'hidden',
-            display: 'grid',
-            gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1.2fr)',
-            minHeight: '650px',
-            boxShadow: '0 40px 100px rgba(0,0,0,0.2)'
-          }}>
-            <div style={{ padding: '5rem', display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: '2rem' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                <div style={{ width: '40px', height: '2px', background: '#38bdf8' }} />
-                <span style={{ color: '#38bdf8', fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase', fontSize: '0.9rem' }}>Flagship Project</span>
-              </div>
-              
-              <h2 style={{ fontSize: 'clamp(3rem, 6vw, 4.5rem)', color: 'white', fontWeight: 800, lineHeight: 1, margin: 0 }}>
-                SIRA
-              </h2>
-              
-              <h3 style={{ fontSize: '1.5rem', color: 'rgba(255,255,255,0.7)', fontWeight: 500, lineHeight: 1.4 }}>
-                Advanced Intelligent Water Management Systems
-              </h3>
-              
-              <p style={{ fontSize: '1.2rem', color: 'rgba(255,255,255,0.6)', lineHeight: 1.7 }}>
-                Responsible for pioneering the future of liquid life, SIRA integrates real-time GIS mapping 
-                with automated filtration tech to ensure sustainable water security across the MENA region.
-              </p>
-              
-              <div style={{ marginTop: '1rem' }}>
-                <NavBtn to="/services" className="btn-get-started btn-roll" style={{ 
-                  background: '#38bdf8', 
-                  color: '#0f172a',
-                  padding: '0 3rem',
-                  height: '72px',
-                  borderRadius: '100px'
-                }}>
-                  <div className="roll-text" style={{ height: '72px' }}>
-                    <span style={{ height: '72px', display: 'flex', alignItems: 'center' }}>Explore Services</span>
-                    <span style={{ height: '72px', display: 'flex', alignItems: 'center' }}>Explore Services</span>
+          <ScrollReveal>
+            <div style={{
+              background: 'transparent',
+              overflow: 'hidden',
+              display: 'grid',
+              gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1.2fr)',
+              minHeight: '650px',
+            }}>
+                <div style={{ padding: '5rem 0', display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: '2rem' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                    <div style={{ width: '40px', height: '2px', background: 'var(--primary-green)' }} />
+                    <span style={{ color: 'var(--primary-green)', fontWeight: 800, letterSpacing: '0.2em', textTransform: 'uppercase', fontSize: '0.9rem' }}>Flagship Project</span>
                   </div>
-                </NavBtn>
+                  
+                  <h2 style={{ fontSize: 'clamp(3rem, 6vw, 5rem)', color: 'var(--dark-green)', fontWeight: 950, lineHeight: 1, margin: 0, letterSpacing: '-0.04em' }}>
+                    SIRA
+                  </h2>
+                  
+                  <h3 style={{ fontSize: '1.6rem', color: '#1a3c34', fontWeight: 700, lineHeight: 1.4, opacity: 0.9 }}>
+                    Advanced Intelligent Water Management Systems
+                  </h3>
+                  
+                  <p style={{ fontSize: '1.2rem', color: '#334155', lineHeight: 1.8, fontWeight: 500 }}>
+                    Responsible for pioneering the future of liquid life, SIRA integrates real-time GIS mapping 
+                    with automated filtration tech to ensure sustainable water security across the MENA region.
+                  </p>
+                  
+                  <div style={{ marginTop: '1rem' }}>
+                    <NavBtn to="/services" className="btn-get-started btn-roll" style={{ 
+                      background: 'var(--dark-green)', 
+                      color: 'white',
+                      padding: '0 3.5rem',
+                      height: '72px',
+                      borderRadius: '100px',
+                      fontWeight: 700
+                    }}>
+                      <div className="roll-text" style={{ height: '72px' }}>
+                        <span style={{ height: '72px', display: 'flex', alignItems: 'center' }}>Explore Services</span>
+                        <span style={{ height: '72px', display: 'flex', alignItems: 'center' }}>Explore Services</span>
+                      </div>
+                    </NavBtn>
+                  </div>
+                </div>
+              
+              <div style={{ position: 'relative', overflow: 'hidden', padding: '2rem' }}>
+                <img 
+                  src="/sira.jpg" 
+                  alt="SIRA Water Facility" 
+                  style={{ 
+                    width: '100%', 
+                    height: '100%', 
+                    objectFit: 'cover',
+                    borderRadius: '40px',
+                    filter: 'brightness(0.95) contrast(1.05)',
+                    transition: 'transform 0.8s cubic-bezier(0.16, 1, 0.3, 1)'
+                  }}
+                  onMouseEnter={(e) => (e.currentTarget.style.transform = 'scale(1.03)')}
+                  onMouseLeave={(e) => (e.currentTarget.style.transform = 'scale(1)')}
+                />
+                
+                {/* Subtle over-image accent */}
+                <div style={{
+                  position: 'absolute',
+                  top: '4rem',
+                  right: '4rem',
+                  width: '80px',
+                  height: '80px',
+                  borderTop: '2px solid var(--primary-green)',
+                  borderRight: '2px solid var(--primary-green)',
+                  pointerEvents: 'none'
+                }} />
               </div>
             </div>
-            
-            <div style={{ position: 'relative', overflow: 'hidden' }}>
-              <img 
-                src="/sira.jpg" 
-                alt="SIRA Water Facility" 
-                style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
-              />
-              <div style={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                width: '100%',
-                height: '100%',
-                background: 'linear-gradient(to right, rgba(15, 23, 42, 1) 0%, rgba(15, 23, 42, 0) 20%)',
-                pointerEvents: 'none'
-              }} />
-            </div>
-          </div>
+          </ScrollReveal>
         </section>
 
-        <LocationSection />
+        <ScrollReveal>
+          <LocationSection />
+        </ScrollReveal>
       </main>
-
-      <Footer />
-      <ScrollToTop lenis={lenis} />
     </>
   );
 };
 
-// --- Components used in Layout ---
-const NavBtn: React.FC<{ to: string; children: React.ReactNode; className?: string; style?: React.CSSProperties }> = ({ to, children, className, style }) => {
+const NavBtn: React.FC<{ to: string; children: React.ReactNode; className?: string; style?: React.CSSProperties } & React.ButtonHTMLAttributes<HTMLButtonElement>> = ({ to, children, className, style, ...rest }) => {
   const { navigateTo } = useContext(TransitionContext);
   return (
     <button 
       onClick={() => navigateTo(to)} 
       className={className} 
-      style={{ background: 'none', border: 'none', padding: 0, font: 'inherit', color: 'inherit', cursor: 'pointer', ...style }}
+      style={{ 
+        background: 'none', 
+        border: 'none', 
+        padding: 0, 
+        font: 'inherit', 
+        color: 'inherit', 
+        cursor: 'pointer', 
+        pointerEvents: 'auto',
+        ...style 
+      }}
+      {...rest}
     >
       {children}
     </button>
@@ -767,6 +964,7 @@ const Navbar: React.FC = () => {
   const location = useLocation();
   const isHomePage = location.pathname === '/';
   const [isTransparent, setIsTransparent] = useState(isHomePage);
+  const [isLogoHovered, setIsLogoHovered] = useState(false);
 
   useEffect(() => {
     if (!isHomePage) {
@@ -802,9 +1000,9 @@ const Navbar: React.FC = () => {
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'space-between',
-      zIndex: 1000,
+      zIndex: 1000000000,
       opacity: 1,
-      pointerEvents: 'all',
+      pointerEvents: 'auto',
       background: isTransparent 
         ? 'transparent' 
         : (isHomePage ? 'rgba(255, 255, 255, 0.05)' : 'rgba(255, 255, 255, 0.7)'),
@@ -817,16 +1015,29 @@ const Navbar: React.FC = () => {
       transition: 'all 0.6s cubic-bezier(0.16, 1, 0.3, 1)',
       color: themeColor
     }}>
-      <NavBtn to="/">
+      <NavBtn 
+        to="/"
+        onMouseEnter={() => setIsLogoHovered(true)}
+        onMouseLeave={() => setIsLogoHovered(false)}
+        style={{ pointerEvents: 'auto' }}
+      >
         <img 
           src="/revera logo.png" 
           alt="Revera Logo" 
           style={{ 
             width: 'auto', 
-            height: '45px', 
+            height: '90px', 
             objectFit: 'contain', 
-            filter: isDarkPage ? 'brightness(0) invert(1)' : 'none',
-            transition: 'all 0.4s ease'
+            filter: isLogoHovered 
+              ? 'brightness(0) saturate(100%) invert(82%) sepia(51%) saturate(542%) hue-rotate(42deg) brightness(97%) contrast(89%)' 
+              : ((isDarkPage) ? 'brightness(0) invert(1)' : 'none'),
+            transition: 'all 0.4s ease',
+            marginTop: '-22.5px',
+            marginBottom: '-22.5px',
+            position: 'relative',
+            zIndex: 10,
+            transform: isLogoHovered ? 'scale(1.05)' : 'scale(1)',
+            pointerEvents: 'none' // Let button handle events
           }} 
         />
       </NavBtn>
@@ -907,7 +1118,8 @@ const ScrollToTop: React.FC<{ lenis: Lenis | null }> = ({ lenis }) => {
         visibility: show ? 'visible' : 'hidden',
         transform: `translateY(${show ? '0' : '20px'}) scale(${show ? '1' : '0.8'})`,
         transition: 'all 0.5s cubic-bezier(0.16, 1, 0.3, 1)',
-        boxShadow: '0 10px 30px rgba(0,0,0,0.1)'
+        boxShadow: '0 10px 30px rgba(0,0,0,0.1)',
+        pointerEvents: show ? 'auto' : 'none'
       }}
     >
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -920,21 +1132,22 @@ const ScrollToTop: React.FC<{ lenis: Lenis | null }> = ({ lenis }) => {
 const TransitionProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isTransitioning, setIsTransitioning] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
 
   const navigateTo = (path: string) => {
-    if (isTransitioning) return;
+    if (location.pathname === path || isTransitioning) return;
+    
     setIsTransitioning(true);
     
     setTimeout(() => {
       navigate(path);
-      // Wait for navigation before revealing
-      setTimeout(() => setIsTransitioning(false), 700);
-    }, 900);
+      window.scrollTo(0, 0);
+      setTimeout(() => setIsTransitioning(false), 500); // Reset state after transition starts clearing
+    }, 850); // Full closing duration + small buffer
   };
 
   return (
-    <TransitionContext.Provider value={{ isTransitioning, navigateTo }}>
-      <TreeTransition isVisible={isTransitioning} />
+    <TransitionContext.Provider value={{ navigateTo, isTransitioning }}>
       {children}
     </TransitionContext.Provider>
   );
@@ -943,46 +1156,44 @@ const TransitionProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 // Services page integrated
 
 const MainLayout: React.FC<{ lenis: Lenis | null }> = ({ lenis }) => {
+  const { isTransitioning } = useContext(TransitionContext);
   return (
-    <TransitionProvider>
+    <>
       <Navbar />
+      <TreeTransition isVisible={isTransitioning} /> 
       <Routes>
-        <Route path="/" element={<LandingPage lenis={lenis} />} />
+        <Route path="/" element={<LandingPage />} />
         <Route path="/about" element={
           <div className="page-wrapper animate-fade-in">
             <AboutPage />
-            <Footer />
           </div>
         } />
         <Route path="/services" element={
           <div className="page-wrapper animate-fade-in">
             <ServicesPage />
-            <Footer />
           </div>
         } />
         <Route path="/contact" element={
           <div className="page-wrapper animate-fade-in">
             <ContactPage />
-            <Footer />
           </div>
         } />
         <Route path="/blog" element={
           <div className="page-wrapper animate-fade-in">
             <Blog />
-            <Footer />
           </div>
         } />
         {["/research"].map(path => (
           <Route key={path} path={path} element={
             <div className="page-wrapper animate-fade-in">
               <AboutPage />
-              <Footer />
             </div>
           } />
         ))}
       </Routes>
+      <Footer />
       <ScrollToTop lenis={lenis} />
-    </TransitionProvider>
+    </>
   );
 };
 
@@ -1017,21 +1228,23 @@ const App: React.FC = () => {
 
   return (
     <BrowserRouter>
-      <div className="app" style={{ position: 'relative' }}>
-        <MainLayout lenis={lenis} />
+      <TransitionProvider>
+        <div className="app" style={{ position: 'relative' }}>
+          <MainLayout lenis={lenis} />
 
-        {/* Global Cinematic Vibe */}
-        <div style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          height: '100vh',
-          background: 'radial-gradient(circle at 50% 0%, rgba(163, 230, 53, 0.05) 0%, transparent 70%)',
-          zIndex: -1,
-          pointerEvents: 'none'
-        }}></div>
-      </div>
+          {/* Global Cinematic Vibe */}
+          <div style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            height: '100vh',
+            background: 'radial-gradient(circle at 50% 0%, rgba(163, 230, 53, 0.05) 0%, transparent 70%)',
+            zIndex: -1,
+            pointerEvents: 'none'
+          }}></div>
+        </div>
+      </TransitionProvider>
     </BrowserRouter>
   );
 };

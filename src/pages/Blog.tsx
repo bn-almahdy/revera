@@ -1,5 +1,6 @@
-import React, { useEffect, useRef, useContext } from 'react';
+import React, { useEffect, useContext } from 'react';
 import { TransitionContext } from '../App';
+import SplitText from '../components/SplitText';
 
 interface Article {
   id: number;
@@ -136,10 +137,18 @@ const Blog: React.FC = () => {
       <main className="container">
         <section style={{ maxWidth: '800px', margin: '0 auto 6rem auto', textAlign: 'center' }}>
           <h1 style={{ fontSize: 'clamp(3.5rem, 8vw, 5.5rem)', color: '#1a3c34', fontWeight: 900, marginBottom: '2rem', letterSpacing: '-0.03em' }}>
-            Latest Insights
+            <SplitText 
+              text="Latest Insights"
+              delay={60}
+              from={{ opacity: 0, transform: 'translate3d(0,40px,0)' }}
+              to={{ opacity: 1, transform: 'translate3d(0,0,0)' }}
+            />
           </h1>
           <p style={{ fontSize: '1.4rem', color: '#1a3c34', opacity: 0.7, lineHeight: 1.6 }}>
-            Stay informed on the cutting edge of sustainability, 4IR technology, and global restoration milestones.
+            <SplitText 
+              text="Stay informed on the cutting edge of sustainability, 4IR technology, and global restoration milestones."
+              delay={30}
+            />
           </p>
         </section>
 

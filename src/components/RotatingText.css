@@ -1,0 +1,44 @@
+.text-rotate {
+  display: inline-flex;
+  flex-wrap: wrap;
+  white-space: pre;
+}
+
+.text-rotate-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+.text-rotate-word {
+  display: inline-flex;
+  white-space: pre;
+}
+
+.text-rotate-element {
+  display: inline-block;
+  white-space: pre;
+}
+
+.text-rotate-lines {
+  display: flex;
+  flex-direction: column;
+}
+
+.custom-rotating-text {
+  background: var(--primary-green);
+  color: var(--dark-green);
+  padding: 0.5rem 1.5rem;
+  border-radius: 1rem;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: 800;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+}

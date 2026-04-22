@@ -1,7 +1,7 @@
-import React, { useState, useRef, useContext } from 'react';
+import React, { useState, useRef } from 'react';
 import gsap from 'gsap';
-import { TransitionContext } from '../App';
 import { useGSAP } from '@gsap/react';
+import SplitText from '../components/SplitText';
 
 const Tree: React.FC<{ x: number; y: number }> = ({ x, y }) => {
   const treeRef = useRef<SVGGElement>(null);
@@ -213,10 +213,18 @@ const ContactPage: React.FC = () => {
         {/* --- Hero Section --- */}
         <section style={{ maxWidth: '900px', margin: '0 auto 6rem auto', textAlign: 'center' }}>
           <h1 style={{ fontSize: 'clamp(3.5rem, 8vw, 5.5rem)', color: '#1a3c34', fontWeight: 900, marginBottom: '2rem', letterSpacing: '-0.03em' }}>
-            Get in touch
+            <SplitText 
+              text="Get in touch"
+              delay={60}
+              from={{ opacity: 0, transform: 'translate3d(0,40px,0)' }}
+              to={{ opacity: 1, transform: 'translate3d(0,0,0)' }}
+            />
           </h1>
           <p style={{ fontSize: '1.4rem', color: '#1a3c34', opacity: 0.7, lineHeight: 1.6, maxWidth: '700px', margin: '0 auto' }}>
-            Choose how you'd like to collaborate with us. Our specialized forms ensure your request reaches the right engineering team.
+            <SplitText 
+              text="Choose how you'd like to collaborate with us. Our specialized forms ensure your request reaches the right engineering team."
+              delay={30}
+            />
           </p>
         </section>
 
